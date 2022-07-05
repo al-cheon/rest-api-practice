@@ -2,6 +2,7 @@ package com.example.demospringrest.controller;
 
 
 import com.example.demospringrest.entity.Post;
+import com.example.demospringrest.payload.PostRequest;
 import com.example.demospringrest.payload.PostResponse;
 import com.example.demospringrest.service.PostService;
 import com.example.demospringrest.utils.CommonConsts;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -22,8 +24,8 @@ public class PostController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createPost(@RequestBody Post post) {
-        Post saved = postService.createPost(post);
+    public ResponseEntity<?> createPost(@RequestBody @Valid PostRequest request) {
+        Post saved = postService.createPost(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 

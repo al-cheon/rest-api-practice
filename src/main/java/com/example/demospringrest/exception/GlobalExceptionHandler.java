@@ -1,16 +1,21 @@
 package com.example.demospringrest.exception;
 
 import com.example.demospringrest.payload.ErrorDetails;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.util.Date;
+import java.util.*;
 
 @ControllerAdvice
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<?> resourceException(ResourceNotFoundException e, WebRequest webRequest) {
@@ -30,7 +35,18 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        Map<String, Object> error = new HashMap<>();
 
-
-
+        BindingResult bindingResult = ex.getBindingResult();
+        Iterator<FieldError> iterator = bindingResult.getFieldErrors().iterator();
+        while (iterator.hasNext()) {
+            FieldError next = iterator.next();
+            String field = next.getField();
+            String message = next.getDefaultMessage();
+            error.put(field, message);
+        }
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
 }

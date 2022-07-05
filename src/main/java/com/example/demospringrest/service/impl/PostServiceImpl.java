@@ -2,10 +2,12 @@ package com.example.demospringrest.service.impl;
 
 import com.example.demospringrest.entity.Post;
 import com.example.demospringrest.exception.ApiException;
+import com.example.demospringrest.payload.PostRequest;
 import com.example.demospringrest.payload.PostResponse;
 import com.example.demospringrest.repository.PostRepository;
 import com.example.demospringrest.service.PostService;
 import lombok.val;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,8 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -24,13 +24,16 @@ public class PostServiceImpl implements PostService {
 
     private PostRepository postRepository;
 
-    public PostServiceImpl(PostRepository postRepository) {
+    private ModelMapper mapper;
+
+    public PostServiceImpl(PostRepository postRepository, ModelMapper mapper) {
         this.postRepository = postRepository;
+        this.mapper = mapper;
     }
 
     @Override
-    public Post createPost(Post post) {
-        val postRepository = this.postRepository;
+    public Post createPost(PostRequest request) {
+        Post post = mapper.map(request, Post.class);
         return postRepository.save(post);
     }
 
