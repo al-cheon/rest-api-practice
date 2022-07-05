@@ -1,0 +1,2 @@
+-- insert into roles value (1, 'ADMIN');
+-- insert into roles value (2, 'USER');

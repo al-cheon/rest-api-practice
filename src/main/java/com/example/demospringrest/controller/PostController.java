@@ -8,6 +8,7 @@ import com.example.demospringrest.service.PostService;
 import com.example.demospringrest.utils.CommonConsts;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -23,6 +24,7 @@ public class PostController {
         this.postService = postService;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<?> createPost(@RequestBody @Valid PostRequest request) {
         Post saved = postService.createPost(request);
@@ -46,12 +48,14 @@ public class PostController {
         return ResponseEntity.ok(post);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<?> updatePost(@RequestBody Post post, @PathVariable(name = "id") Long id) {
         Post updated = postService.updatePost(id, post);
         return ResponseEntity.ok(updated);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletePost(@PathVariable(name = "id") Long id) {
         postService.deletePost(id);
