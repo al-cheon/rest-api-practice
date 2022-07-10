@@ -2,10 +2,12 @@ package com.example.demospringrest.controller;
 
 import com.example.demospringrest.entity.Role;
 import com.example.demospringrest.entity.User;
+import com.example.demospringrest.payload.JWTAuthResponse;
 import com.example.demospringrest.payload.LoginDto;
 import com.example.demospringrest.payload.SignUpDto;
 import com.example.demospringrest.repository.RoleRepository;
 import com.example.demospringrest.repository.UserRepository;
+import com.example.demospringrest.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -37,11 +40,16 @@ public class AuthController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
     @PostMapping("/signin")
     public ResponseEntity<?> authenticationUser(@RequestBody LoginDto loginDto) {
         Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUsernameOrEmail(), loginDto.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authenticate);
-        return new ResponseEntity<>("User signed-in successfully! ", HttpStatus.OK);
+
+        String token = jwtTokenProvider.generationToken(authenticate);
+        return ResponseEntity.ok(new JWTAuthResponse(token));
     }
 
     @PostMapping("/signup")
